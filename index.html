@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+
+<html lang="sv">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Älgholm RP - Din Bloxburg Gemenskap</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+
+        /* Anpassad CSS för att säkerställa att modalen är centrerad och täcker skärmen */
+
+        .modal {
+
+            display: none; /* Dölj modalen som standard */
+
+            position: fixed;
+
+            z-index: 1000; /* Högre än andra element */
+
+            left: 0;
+
+            top: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            overflow: auto;
+
+            background-color: rgba(0,0,0,0.7); /* Mörk bakgrund */
+
+            justify-content: center;
+
+            align-items: center;
+
+        }
+
+        .modal-content {
+
+            background-color: #fefefe;
+
+            margin: auto;
+
+            padding: 2rem;
+
+            border-radius: 1rem;
+
+            width: 90%;
+
+            max-width: 500px;
+
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+            position: relative;
+
+        }
+
+        /* Specifik stil för modaler för att göra dem lite bredare */
+
+        #hotel-details-modal .modal-content,
+
+        #karlssons-ekonomi-modal .modal-content,
+
+        #karlssons-korskola-modal .modal-content,
+
+        #karlssons-juridik-modal .modal-content,
+
+        #din-advokat-modal .modal-content,
+
+        #house-rental-modal .modal-content,
+
+        #message-send-modal .modal-content,
+
+        #job-post-modal .modal-content,
+
+        #rp-session-create-modal .modal-content,
+
+        #news-create-modal .modal-content,
+
+        #job-detail-modal .modal-content,
+
+        #housing-detail-modal .modal-content,
+
+        #rp-session-detail-modal .modal-content,
+
+        #news-detail-modal .modal-content,
+
+        #emporia-details-modal .modal-content,
+
+        #admin-message-log-modal .modal-content, /* Ny för admin användarhantering */
+
+        #admin-user-management-modal .modal-content, /* Ny för admin användarhantering */
+
+        #sjukvard-modal .modal-content, /* Ny för sjukvårdssidan */
+
+        #polis-modal .modal-content, /* Ny för polissidan */
+
+        #borgmastare-modal .modal-content, /* Ny för borgmästarsidan */
+
+        #korskola-modal .modal-content, /* Ny för körskolesidan */
+
+        #korskola-larare-dashboard-modal .modal-content, /* Ny för körskola lärare dashboard */
+
+        #confirmation-modal .modal-content /* Ny för bekräftelsemodal */
+
+        {
+
+            max-width: 700px; /* Gör modalerna bredare */
+
+        }
+
+        /* Stil för notisrutan */
+
+        #notification-modal {
+
+            display: none;
+
+            position: fixed;
+
+            top: 20px;
+
+            right: 20px;
+
+            z-index: 1100; /* Högre än andra modaler */
+
+            background-color: #4CAF50; /* Grön bakgrund */
+
+            color: white;
+
+            padding: 15px 25px;
+
+            border-radius: 8px;
+
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+            animation: fadeInOut 8s forwards; /* Animation för att tona in och ut */
+
+            max-width: 300px;
+
+            cursor: pointer;
+
+        }
+
+        #notification-modal.error {
+
+            background-color: #f44336; /* Röd bakgrund för fel */
+
+        }
+
+        @keyframes fadeInOut {
+
+            0% { opacity: 0; transform: translateY(-20px); }
+
+            10% { opacity: 1; transform: translateY(0); }
+
+            90% { opacity: 1; transform: translateY(0); }
+
+            100% { opacity: 0; transform: translateY(-20px); }
+
+        }
+
+        .close-button {
+
+            color: #aaa;
+
+            float: right;
+
+            font-size: 28px;
+
+            font-weight: bold;
+
+            position: absolute;
+
+            top: 1rem;
+
+            right: 1.5rem;
+
+            cursor: pointer;
+
+        }
+
+        .close-button:hover,
+
+        .close-button:focus {
+
+            color: black;
+
+            text-decoration: none;
+
+            cursor: pointer;
+
+        }
+
+        .tab-button.active {
+
+            background-color: #2b6cb0; /* Custom Blue-700 */
+
+            color: white;
+
+        }
+
+        .role-tab-button.active {
+
+            background-color: #2b6cb0; /* Custom Blue-700 */
+
+            color: white;
+
+        }
+
+        .section {
+
+            display: none; /* Dölj alla sektioner som standard */
+
+        }
+
+        .section.active {
+
+            display: block; /* Visa den aktiva sektionen */
+
+        }
+
+        .message-item {
+
+            background-color: #f9fafb;
+
+            border: 1px solid #e5e7eb;
+
+            padding: 1rem;
+
+            border-radius: 0.5rem;
+
+            margin-bottom: 0.75rem;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+        }
+
+        .message-item.unread {
+
+            background-color: #fffbeb; /* Ljusgul för olästa */
+
+            border-color: #fcd34d; /* Gul kant */
+
+            font-weight: bold;
+
+        }
+
+        .dynamic-card {
+
+            background-color: #fff;
+
+            border-radius: 0.75rem;
+
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+            overflow: hidden;
+
+            transition: transform 0.3s ease-in-out;
+
+        }
+
+        .dynamic-card:hover {
+
+            transform: translateY(-5px);
+
+        }
+
+        .dynamic-card img {
+
+            width: 100%;
+
+            height: 180px;
+
+            object-fit: cover;
+
+        }
+
+        .dynamic-card-content {
+
+            padding: 1.5rem;
+
+        }
+
+        .dynamic-card-title {
+
+            font-size: 1.5rem;
+
+            font-weight: 600;
+
+            color: #2c5282; /* Custom Blue-800 */
+
+            margin-bottom: 0.5rem;
+
+        }
+
+        .dynamic-card-description {
+
+            color: #4b5563; /* Gray-700 */
+
+            font-size: 0.95rem;
+
+            line-height: 1.5;
+
+            margin-bottom: 1rem;
+
+        }
+
+        .dynamic-card-footer {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            padding: 0 1.5rem 1.5rem;
+
+        }
+
+        .role-content-section {
+
+            display: none;
+
+            margin-top: 1rem;
+
+            padding: 1rem;
+
+            background-color: #f0f9ff;
+
+            border-radius: 0.5rem;
+
+            border: 1px solid #bfdbfe;
+
+        }
+
+        .role-content-section.active {
+
+            display: block;
+
+        }
+
+    </style>
+
+</head>
+
+<body class="bg-gradient-to-br from-blue-50 to-blue-200 font-sans text-gray-800 min-h-screen flex flex-col">
+
+
+
+    <nav class="bg-blue-800 p-4 shadow-lg">
+
+        <div class="container mx-auto flex flex-wrap justify-between items-center">
+
+            <a href="#" id="home-link" class="text-white text-3xl font-bold rounded-lg px-3 py-1 hover:bg-blue-700 transition-colors">
+
+                <img src="mkk.jpg" alt="Älgholm Kommun Logga" class="h-10 inline-block mr-2"> Älgholm RP
+
+            </a>
+
+            <div class="block lg:hidden">
+
+                <button id="nav-toggle" class="flex items-center px-3 py-2 border rounded text-blue-200 border-blue-400 hover:text-white hover:border-white">
+
+                    <svg class="fill-current h-3 w-3" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><title>Menu</title><path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v15z"/></svg>
+
+                </button>
+
+            </div>
+
+            <div class="w-full flex-grow lg:flex lg:items-center lg:w-auto hidden" id="nav-content">
+
+                <ul class="text-lg lg:flex justify-end flex-1 items-center">
+
+                    <li><a href="#" data-section="home" class="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white mr-6 p-2 rounded-md transition-colors">Startsida</a></li>
+
+                    <li><a href="#" data-section="housing" class="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white mr-6 p-2 rounded-md transition-colors">Hitta Bostäder</a></li>
+
+                    <li><a href="#" data-section="jobs" class="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white mr-6 p-2 rounded-md transition-colors">Sök Jobb</a></li>
+
+                    <li><a href="#" data-section="rp-sessions" class="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white mr-6 p-2 rounded-md transition-colors">RP-sessioner</a></li>
+
+                    <li><a href="#" data-section="news-channel" class="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white mr-6 p-2 rounded-md transition-colors">Nyhetskanal</a></li>
+
+                    <li><a href="#" data-section="businesses" class="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white mr-6 p-2 rounded-md transition-colors">Företag</a></li>
+
+                    <li><a href="#" data-section="municipality" class="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white mr-6 p-2 rounded-md transition-colors">Kommunen</a></li>
+
+                    <li><button id="login-button" class="bg-yellow-500 hover:bg-yellow-600 text-blue-900 font-bold py-2 px-4 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 mt-4 lg:mt-0">Logga in / Skapa konto</button></li>
+
+                    <li id="my-algholm-nav-item" class="hidden"><a href="#" data-section="my-algholm" class="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white ml-6 p-2 rounded-md transition-colors bg-blue-700">Mitt Älgholm</a></li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+
+    <main class="container mx-auto p-6 flex-grow">
+
+
+
+        <section id="home-section" class="section active bg-white p-8 rounded-xl shadow-xl mb-8">
+
+            <h1 class="text-5xl font-extrabold text-blue-800 mb-6 text-center">Välkommen till Älgholm!</h1>
+
+            <p class="text-lg text-gray-700 mb-6 leading-relaxed text-center">
+
+                Upptäck en levande och dynamisk rollspelsvärld i Bloxburg, Roblox. Älgholm är staden där dina drömmar kan bli verklighet! Här kan du hitta ditt perfekta hem, starta en karriär, utforska lokala företag och bli en del av vår växande gemenskap.
+
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-8 mt-10">
+
+                <div class="bg-blue-50 p-6 rounded-lg shadow-md flex items-center space-x-4">
+
+                    <i class="fas fa-house-user text-4xl text-blue-600"></i>
+
+                    <div>
+
+                        <h3 class="text-2xl font-semibold text-blue-800 mb-2">Hitta ditt drömhem</h3>
+
+                        <p class="text-gray-600">Utforska lägenheter, hotell och unika bostäder som passar din karaktärs stil och budget.</p>
+
+                    </div>
+
+                </div>
+
+                <div class="bg-green-50 p-6 rounded-lg shadow-md flex items-center space-x-4">
+
+                    <i class="fas fa-briefcase text-4xl text-green-600"></i>
+
+                    <div>
+
+                        <h3 class="text-2xl font-semibold text-green-800 mb-2">Bygg din karriär</h3>
+
+                        <p class="text-gray-600">Sök spännande jobb inom sjukvård, utbildning, polisväsende och mer!</p>
+
+                    </div>
+
+                </div>
+
+                <div class="bg-yellow-50 p-6 rounded-lg shadow-md flex items-center space-x-4">
+
+                    <i class="fas fa-building text-4xl text-yellow-600"></i>
+
+                    <div>
+
+                        <h3 class="text-2xl font-semibold text-yellow-800 mb-2">Upptäck lokala företag</h3>
+
+                        <p class="text-gray-600">Från körskolor till advokatbyråer – Älgholm har allt du behöver.</p>
+
+                    </div>
+
+                </div>
+
+                <div class="bg-blue-50 p-6 rounded-lg shadow-md flex items-center space-x-4">
+
+                    <i class="fas fa-school text-4xl text-blue-600"></i>
+
+                    <div>
+
+                        <h3 class="text-2xl font-semibold text-blue-800 mb-2">Regnbågsskolan</h3>
+
+                        <p class="text-gray-600">Lär dig och växa i vår prestigefyllda skola för alla åldrar.</p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="text-center mt-10">
+
+                <button id="home-login-button" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-full text-xl shadow-xl transition-all duration-300 transform hover:scale-105">
+
+                    Bli en del av Älgholm idag! Logga in / Skapa konto
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+
+        <section id="my-algholm-section" class="section bg-white p-8 rounded-xl shadow-xl mb-8">
+
+            <h2 class="text-4xl font-extrabold text-blue-800 mb-6 text-center">Mitt Älgholm</h2>
+
+            <div class="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
+
+                <div class="w-48 h-48 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden shadow-lg">
+
+                    <img id="profile-picture-display" src="https://placehold.co/192x192/cccccc/333333?text=Profilbild" alt="Profilbild" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/192x192/cccccc/333333?text=Bild+saknas';">
+
+                </div>
+
+                <div class="flex-grow text-center md:text-left">
+
+                    <p class="text-2xl font-bold text-gray-900 mb-2"><span id="character-name-display"></span></p>
+
+                    <p class="text-lg text-gray-700 mb-1">Personnummer: <span id="personal-number-display" class="font-mono text-blue-700"></span></p>
+
+                    <p class="text-lg text-gray-700 mb-1">Discord: <span id="discord-name-display"></span></p>
+
+                    <p class="text-lg text-gray-700 mb-1">Karaktärstyp: <span id="character-type-display"></span></p>
+
+                    <p class="text-lg text-gray-700 mb-4">Drömjobb: <span id="dream-job-display"></span></p>
+
+                    <p class="text-lg text-gray-700 mb-4">Roller: <span id="user-roles-display" class="font-semibold text-purple-700"></span></p>
+
+
+
+
+
+                    <button id="upload-profile-pic-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300 transform hover:scale-105">
+
+                        <i class="fas fa-camera mr-2"></i>Ladda upp profilbild
+
+                    </button>
+
+                    <input type="file" id="profile-picture-input" accept="image/*" class="hidden">
+
+                </div>
+
+            </div>
+
+            <div class="mt-8 border-t pt-6 border-gray-200">
+
+                <h3 class="text-2xl font-semibold text-blue-700 mb-4">Mina Aktiviteter</h3>
+
+                <ul class="list-disc list-inside text-gray-700 space-y-2">
+
+                    <li><i class="fas fa-home mr-2 text-blue-500"></i>Nuvarande Bostad: <span id="current-housing-display">Ingen bostad vald</span></li>
+
+                    <li><i class="fas fa-briefcase mr-2 text-blue-500"></i>Nuvarande Jobb: <span id="current-job-display">Inget jobb valt</span></li>
+
+                    <li><i class="fas fa-calendar-alt mr-2 text-blue-500"></i>Kommande Evenemang: Inga just nu</li>
+
+                </ul>
+
+            </div>
+
+
+
+            <div class="mt-8 border-t pt-6 border-gray-200">
+
+                <h3 class="text-2xl font-semibold text-blue-700 mb-4">Mina Meddelanden (<span id="unread-messages-count">0</span> olästa)</h3>
+
+                <div id="messages-list" class="space-y-3">
+
+                    <p class="text-gray-500" id="no-messages-text">Inga meddelanden än.</p>
+
+                </div>
+
+                <button id="mark-all-read-button" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300 mt-4 hidden">
+
+                    Markera alla som lästa
+
+                </button>
+
+                <button id="view-admin-messages-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300 mt-4 hidden">
+
+                    <i class="fas fa-shield-alt mr-2"></i>Visa alla meddelanden (Admin)
+
+                </button>
+
+                <button id="open-admin-user-management-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300 mt-4 hidden">
+
+                    <i class="fas fa-users-cog mr-2"></i>Hantera Användare (Admin)
+
+                </button>
+
+            </div>
+
+
+
+            <div class="mt-8 border-t pt-6 border-gray-200" id="role-specific-buttons-container">
+
+                <h3 class="text-2xl font-semibold text-blue-700 mb-4">Mina Roll-specifika Verktyg</h3>
+
+                </div>
+
+
+
+
+
+            <div class="mt-8 text-center space-x-4">
+
+                <button id="send-message-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
+
+                    <i class="fas fa-envelope mr-2"></i>Meddela
+
+                </button>
+
+                <button id="logout-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
+
+                    Logga ut
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+
+        <section id="housing-section" class="section bg-white p-8 rounded-xl shadow-xl mb-8">
+
+            <h2 class="text-4xl font-extrabold text-blue-800 mb-6 text-center">Hitta Bostäder i Älgholm</h2>
+
+            <p class="text-lg text-gray-700 mb-8 text-center">Utforska de olika boendemöjligheterna i vår stad. Oavsett om du söker en mysig lägenhet eller ett lyxigt hotellrum, har Älgholm något för dig!</p>
+
+
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+                <div class="bg-blue-50 rounded-lg shadow-md overflow-hidden transform transition-transform hover:scale-105">
+
+                    <img src="https://placehold.co/400x250/a78bfa/ffffff?text=Lägenhet" alt="Lägenhet i Älgholm" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/400x250/cccccc/333333?text=Bild+saknas';">
+
+                    <div class="p-6">
+
+                        <h3 class="text-2xl font-semibold text-blue-800 mb-2">Central Lägenhet</h3>
+
+                        <p class="text-gray-700 mb-4">En modern lägenhet i hjärtat av Älgholm, perfekt för singlar eller par. Nära till allt!</p>
+
+                        <ul class="text-gray-600 text-sm mb-4 space-y-1">
+
+                            <li><i class="fas fa-bed mr-2 text-blue-500"></i>1 Sovrum</li>
+
+                            <li><i class="fas fa-bath mr-2 text-blue-500"></i>1 Badrum</li>
+
+                            <li><i class="fas fa-ruler-combined mr-2 text-blue-500"></i>60 kvm</li>
+
+                        </ul>
+
+                        <div class="flex justify-between items-center">
+
+                            <span class="text-xl font-bold text-blue-700">5,000 kr/mån</span>
+
+                            <button id="open-central-apartment-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300">Mer info</button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="bg-yellow-50 rounded-lg shadow-md overflow-hidden transform transition-transform hover:scale-105">
+
+                    <img src="https://placehold.co/400x250/fcd34d/ffffff?text=Hotellrum" alt="Hotellrum i Älgholm" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/400x250/cccccc/333333?text=Bild+saknas';">
+
+                    <div class="p-6">
+
+                        <h3 class="text-2xl font-semibold text-yellow-800 mb-2">Grand Hotell Älgholm</h3>
+
+                        <p class="text-gray-700 mb-4">Lyxiga hotellrum för kortare eller längre vistelser. Inkluderar frukost och tillgång till gym.</p>
+
+                        <ul class="text-gray-600 text-sm mb-4 space-y-1">
+
+                            <li><i class="fas fa-bed mr-2 text-yellow-500"></i>Dubbelrum</li>
+
+                            <li><i class="fas fa-bath mr-2 text-yellow-500"></i>Eget badrum</li>
+
+                            <li><i class="fas fa-concierge-bell mr-2 text-yellow-500"></i>Rumsservice</li>
+
+                        </ul>
+
+                        <div class="flex justify-between items-center">
+
+                            <span class="text-xl font-bold text-yellow-700">800 kr/natt</span>
+
+                            <button id="open-hotel-details-button" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300">Mer info</button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <div id="dynamic-housing-listings-container" class="contents">
+
+                    </div>
+
+            </div>
+
+            <div class="text-center mt-8">
+
+                <button id="open-house-rental-button" class="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-6 rounded-full shadow-md transition-all duration-300 hidden">
+
+                    <i class="fas fa-plus mr-2"></i>Lägg ut egen annons
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+
+        <section id="school-section" class="section bg-white p-8 rounded-xl shadow-xl mb-8">
+
+            <h2 class="text-4xl font-extrabold text-blue-800 mb-6 text-center">Regnbågsskolan</h2>
+
+            <p class="text-lg text-gray-700 mb-8 text-center">
+
+                Välkommen till Regnbågsskolan, Älgholms ledande institution för lärande och utveckling! Vi erbjuder en stimulerande miljö där varje elev kan blomstra.
+
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-8">
+
+                <div>
+
+                    <h3 class="text-2xl font-semibold text-blue-700 mb-4">Vår Vision</h3>
+
+                    <p class="text-gray-700 mb-4">
+
+                        På Regnbågsskolan strävar vi efter att ge våra elever de bästa förutsättningarna för framgång, både akademiskt och personligt. Vi fokuserar på kreativitet, kritiskt tänkande och samarbete.
+
+                    </p>
+
+                    <h3 class="text-2xl font-semibold text-blue-700 mb-4">Kurser och Program</h3>
+
+                    <ul class="list-disc list-inside text-gray-700 space-y-2">
+
+                        <li><i class="fas fa-book-open mr-2 text-blue-500"></i>Grundläggande Ämnen (Matte, Svenska, Engelska)</li>
+
+                        <li><i class="fas fa-palette mr-2 text-blue-500"></i>Konst och Kreativitet</li>
+
+                        <li><i class="fas fa-flask mr-2 text-blue-500"></i>Naturvetenskap och Teknik</li>
+
+                        <li><i class="fas fa-music mr-2 text-blue-500"></i>Musik och Drama</li>
+
+                        <li><i class="fas fa-running mr-2 text-blue-500"></i>Idrott och Hälsa</li>
+
+                    </ul>
+
+                </div>
+
+                <div>
+
+                    <img src="https://placehold.co/500x300/818cf8/ffffff?text=Regnbågsskolan" alt="Regnbågsskolan" class="w-full rounded-lg shadow-md mb-4" onerror="this.onerror=null;this.src='https://placehold.co/500x300/cccccc/333333?text=Bild+saknas';">
+
+                    <h3 class="text-2xl font-semibold text-blue-700 mb-4">Vår Personal</h3>
+
+                    <p class="text-gray-700">
+
+                        Vårt team av engagerade lärare och personal är dedikerade till att skapa en trygg och inspirerande lärmiljö. Vi ser fram emot att välkomna dig!
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <section id="jobs-section" class="section bg-white p-8 rounded-xl shadow-xl mb-8">
+
+            <h2 class="text-4xl font-extrabold text-blue-800 mb-6 text-center">Sök Jobb i Älgholm</h2>
+
+            <p class="text-lg text-gray-700 mb-8 text-center">Älgholm erbjuder en mängd karriärmöjligheter. Hitta ditt drömjobb nedan och skicka in din ansökan!</p>
+
+
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="job-listings-container">
+
+                </div>
+
+            <div class="text-center mt-8">
+
+                <button id="open-job-post-button" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-6 rounded-full shadow-md transition-all duration-300 hidden">
+
+                    <i class="fas fa-plus mr-2"></i>Lägg ut jobbannons
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+
+        <section id="rp-sessions-section" class="section bg-white p-8 rounded-xl shadow-xl mb-8">
+
+            <h2 class="text-4xl font-extrabold text-blue-800 mb-6 text-center">RP-sessioner i Älgholm</h2>
+
+            <p class="text-lg text-gray-700 mb-8 text-center">Här kan du hitta och anmäla dig till kommande rollspelsessioner, eller skapa egna!</p>
+
+
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="rp-sessions-listings-container">
+
+                </div>
+
+            <div class="text-center mt-8">
+
+                <button id="open-rp-session-create-button" class="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-6 rounded-full shadow-md transition-all duration-300 hidden">
+
+                    <i class="fas fa-plus mr-2"></i>Skapa ny RP-session
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+
+        <section id="news-channel-section" class="section bg-white p-8 rounded-xl shadow-xl mb-8">
+
+            <h2 class="text-4xl font-extrabold text-blue-800 mb-6 text-center">Älgholms Nyhetskanal</h2>
+
+            <p class="text-lg text-gray-700 mb-8 text-center">Håll dig uppdaterad med de senaste händelserna och nyheterna från Älgholm!</p>
+
+
+
+            <div class="grid md:grid-cols-1 lg:grid-cols-2 gap-8" id="news-articles-container">
+
+                </div>
+
+            <div class="text-center mt-8">
+
+                <button id="open-news-create-button" class="bg-yellow-600 hover:bg-yellow-700 text-blue-900 font-bold py-2 px-6 rounded-full shadow-md transition-all duration-300 hidden">
+
+                    <i class="fas fa-plus mr-2"></i>Skapa nyhet
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+
+
+
+        <section id="businesses-section" class="section bg-white p-8 rounded-xl shadow-xl mb-8">
+
+            <h2 class="text-4xl font-extrabold text-blue-800 mb-6 text-center">Företag i Älgholm</h2>
+
+            <p class="text-lg text-gray-700 mb-8 text-center">Älgholm är hem för en blomstrande företagsgemenskap. Här är några av de ledande företagen i staden:</p>
+
+
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+                <div class="bg-green-50 rounded-lg shadow-md p-6 transform transition-transform hover:scale-105">
+
+                    <i class="fas fa-car text-5xl text-green-600 mb-4"></i>
+
+                    <h3 class="text-2xl font-semibold text-green-800 mb-2">Karlssons Körskola</h3>
+
+                    <p class="text-gray-700 mb-4">Ta ditt körkort i Älgholm med Karlssons Körskola. Erfarna instruktörer och moderna fordon.</p>
+
+                    <button id="open-karlssons-korskola-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300">Mer info</button>
+
+                </div>
+
+                <div class="bg-yellow-50 rounded-lg shadow-md p-6 transform transition-transform hover:scale-105">
+
+                    <i class="fas fa-chart-line text-5xl text-yellow-600 mb-4"></i>
+
+                    <h3 class="text-2xl font-semibold text-yellow-800 mb-2">Karlssons Ekonomihantering</h3>
+
+                    <p class="text-gray-700 mb-4">Professionell hjälp med din ekonomi, bokföring och finansiell rådgivning för privatpersoner och företag.</p>
+
+                    <button id="open-karlssons-ekonomi-button" class="bg-yellow-600 hover:bg-yellow-700 text-blue-900 font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300">Mer info</button>
+
+                </div>
+
+                <div class="bg-blue-50 rounded-lg shadow-md p-6 transform transition-transform hover:scale-105">
+
+                    <i class="fas fa-gavel text-5xl text-blue-600 mb-4"></i>
+
+                    <h3 class="text-2xl font-semibold text-blue-800 mb-2">Karlssons Juridik</h3>
+
+                    <p class="text-gray-700 mb-4">Experter på juridiska frågor. Få rådgivning och representation inom alla rättsområden.</p>
+
+                    <button id="open-karlssons-juridik-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300">Mer info</button>
+
+                </div>
+
+                <div class="bg-red-50 rounded-lg shadow-md p-6 transform transition-transform hover:scale-105">
+
+                    <i class="fas fa-balance-scale text-5xl text-red-600 mb-4"></i>
+
+                    <h3 class="text-2xl font-semibold text-red-800 mb-2">Din Advokat</h3>
+
+                    <p class="text-gray-700 mb-4">Personlig och pålitlig juridisk hjälp. Vi står vid din sida i alla juridiska processer.</p>
+
+                    <button id="open-din-advokat-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300">Mer info</button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <section id="municipality-section" class="section bg-white p-8 rounded-xl shadow-xl mb-8">
+
+            <h2 class="text-4xl font-extrabold text-blue-800 mb-6 text-center">Älgholms Kommun</h2>
+
+            <p class="text-lg text-gray-700 mb-8 text-center">
+
+                Älgholms kommun arbetar för att skapa en trygg, trivsam och välfungerande stad för alla invånare. Här hittar du viktig information om stadens tjänster och styrning.
+
+            </p>
+
+
+
+            <div class="grid md:grid-cols-2 gap-8">
+
+                <div>
+
+                    <h3 class="text-2xl font-semibold text-blue-700 mb-4">Våra Tjänster</h3>
+
+                    <ul class="list-disc list-inside text-gray-700 space-y-2">
+
+                        <li><i class="fas fa-city mr-2 text-blue-500"></i>Bygglov och Stadsplanering</li>
+
+                        <li><i class="fas fa-hands-helping mr-2 text-blue-500"></i>Socialtjänst och Stöd</li>
+
+                        <li><i class="fas fa-road mr-2 text-blue-500"></i>Vägar och Infrastruktur</li>
+
+                        <li><i class="fas fa-lightbulb mr-2 text-blue-500"></i>Energi och Miljö</li>
+
+                        <li><i class="fas fa-fire-extinguisher mr-2 text-blue-500"></i>Räddningstjänst</li>
+
+                    </ul>
+
+                    <button id="open-school-from-municipality-button" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300 transform hover:scale-105 mt-6">
+
+                        <i class="fas fa-school mr-2"></i>Skola
+
+                    </button>
+
+                </div>
+
+                <div>
+
+                    <img src="https://placehold.co/500x300/60a5fa/ffffff?text=Kommunhus" alt="Älgholms Kommunhus" class="w-full rounded-lg shadow-md mb-4" onerror="this.onerror=null;this.src='https://placehold.co/500x300/cccccc/333333?text=Bild+saknas';">
+
+                    <h3 class="text-2xl font-semibold text-blue-700 mb-4">Viktiga Förvaltningar</h3>
+
+                    <p class="text-gray-700 mb-4">
+
+                        Kommunen är uppdelad i flera nyckelförvaltningar för att effektivt hantera stadens angelägenheter och service.
+
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                        <button id="open-sjukvard-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300 transform hover:scale-105">
+
+                            <i class="fas fa-hospital-alt mr-2"></i>Sjukvård
+
+                        </button>
+
+                        <button id="open-polis-button" class="bg-blue-900 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300 transform hover:scale-105">
+
+                            <i class="fas fa-shield-alt mr-2"></i>Polis
+
+             
+
+
+
